@@ -26,17 +26,25 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.material.snackbar.Snackbar
 import kotlin.random.Random
 
-
+/**
+ * The Main Class - pretty much does everything
+ */
 class MainActivity : AppCompatActivity() {
     private val boxes = mutableListOf<ImageView>()
     private var afikomen: Int? = null
     private lateinit var resetButton: Button
-    private lateinit var txtHeader : TextView
+    private lateinit var txtHeader: TextView
     private lateinit var gameGrid: GridLayout
     private lateinit var imgAfikomen: ImageView
-    private var startTime : Long = 0L
-    private lateinit var mAdView : AdView
+    private var startTime: Long = 0L
+    private lateinit var mAdView: AdView
     private var mediaPlayer: MediaPlayer? = null
+
+    /**
+     * Creates the game board and initializes everything
+     *
+     * @param savedInstanceState {Bundle} instance state, currently protecting the Afikomen
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
 
         savedInstanceState?.let {
@@ -108,18 +116,18 @@ class MainActivity : AppCompatActivity() {
     inner class SearchListener(private val id: Int) : View.OnClickListener {
         override fun onClick(v: View?) {
             // Log.i("SearchListener","Id is " + id)
-            if (startTime==0L){
+            if (startTime == 0L) {
                 startTime = System.currentTimeMillis()
             }
             if (id == afikomen) {
                 txtHeader.setText(R.string.afikomen_found)
                 gameGrid.visibility = View.GONE
                 imgAfikomen.visibility = View.VISIBLE
-                resetButton.visibility=View.VISIBLE
+                resetButton.visibility = View.VISIBLE
                 mediaPlayer = MediaPlayer.create(this@MainActivity, R.raw.dayenu)
                 mediaPlayer!!.start()
                 dancingImage()
-                showTime((System.currentTimeMillis()-startTime) / 1000.0)
+                showTime((System.currentTimeMillis() - startTime) / 1000.0)
 
             } else {
                 fadeBox(v!!)
@@ -127,22 +135,37 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+
+        /** Shows the time from the first box clicked to finding the afikomen
+         * @param playTime {Double| time taken
+         */
         private fun showTime(playTime: Double) {
 
-            val snackbar = Snackbar.make(findViewById(R.id.mainLayout),
-                getString(R.string.gameTime,playTime),
-                Snackbar.LENGTH_LONG)
-            val mainTextView : TextView =
+            val snackbar = Snackbar.make(
+                findViewById(R.id.mainLayout),
+                getString(R.string.gameTime, playTime),
+                Snackbar.LENGTH_LONG
+            )
+            val mainTextView: TextView =
                 snackbar.view.findViewById(com.google.android.material.R.id.snackbar_text)
-           // mainTextView.typeface = Typeface.create("casual",Typeface.BOLD)
-            snackbar.view.setBackgroundColor( ContextCompat.getColor(this@MainActivity,R.color.snackBack))
+            // mainTextView.typeface = Typeface.create("casual",Typeface.BOLD)
+            snackbar.view.setBackgroundColor(
+                ContextCompat.getColor(
+                    this@MainActivity,
+                    R.color.snackBack
+                )
+            )
             mainTextView.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.snackText))
-            mainTextView.setTextSize(16.0F)
+            mainTextView.textSize = 16.0F
             snackbar.show()
         }
+
+        /**
+         * Animates the Afikomen by scaling image, and spinning from -45 to 45 degrees
+         */
         private fun dancingImage() {
-            val animeTurn = ObjectAnimator.ofFloat(imgAfikomen,"rotation",-45f,45f)
-            animeTurn.setDuration(800)
+            val animeTurn = ObjectAnimator.ofFloat(imgAfikomen, "rotation", -45f, 45f)
+            animeTurn.duration = 800
             val scaleXAnimation =
                 ObjectAnimator.ofFloat(imgAfikomen, "scaleX", 0.1f, 1.0f)
             scaleXAnimation.interpolator = AccelerateDecelerateInterpolator()
@@ -155,9 +178,14 @@ class MainActivity : AppCompatActivity() {
             animatorSet.play(animeTurn).with(scaleXAnimation).with(scaleYAnimation)
             animatorSet.start()
         }
-        private fun fadeBox(v:View) {
-            val animateFade = ObjectAnimator.ofFloat(v,"alpha",0F)
-            animateFade.setDuration(300)
+
+        /**
+         * Fades out box when clicked
+         * @param v {View} box to fade
+         */
+        private fun fadeBox(v: View) {
+            val animateFade = ObjectAnimator.ofFloat(v, "alpha", 0F)
+            animateFade.duration = 300
             animateFade.start()
         }
     }
@@ -173,11 +201,11 @@ class MainActivity : AppCompatActivity() {
             txtHeader.setText(R.string.find_the_afikomen)
             imgAfikomen.visibility = View.GONE
             gameGrid.visibility = View.VISIBLE
-            resetButton.visibility=View.GONE
+            resetButton.visibility = View.GONE
             afikomen = Random.nextInt(0, 24)
             boxes.forEach {
                 it.alpha = 1F
-               // it.visibility = View.VISIBLE
+                // it.visibility = View.VISIBLE
             }
         }
     }
